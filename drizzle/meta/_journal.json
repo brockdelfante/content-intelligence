@@ -1,5 +1,20 @@
 {
   "version": "7",
   "dialect": "mysql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1779638570155,
+      "tag": "0000_rapid_rumiko_fujikawa",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1779638723441,
+      "tag": "0001_shocking_justice",
+      "breakpoints": true
+    }
+  ]
 }

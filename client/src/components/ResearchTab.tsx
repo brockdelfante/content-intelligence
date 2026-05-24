@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { BarChart2, Globe, Loader2, Newspaper, TrendingUp } from "lucide-react";
+import { BarChart2, ExternalLink, Globe, Loader2, Newspaper, TrendingUp } from "lucide-react";
 import { useState } from "react";
 import { trpc } from "../lib/trpc";
 
@@ -46,6 +46,8 @@ export default function ResearchTab() {
     source: string;
     summary: string;
     url?: string;
+    publishedDate?: string;
+    publication?: string;
   }[];
   const trends = (summary?.trends ?? []) as { trend: string; relevance: string }[];
   const competitors = (summary?.competitorActivity ?? []) as {
@@ -101,22 +103,34 @@ export default function ResearchTab() {
                 key={i}
                 className="rounded-lg border border-border bg-card p-3 hover:border-primary/30 transition-colors"
               >
-                <div className="flex items-start justify-between gap-2 mb-1">
-                  {item.url ? (
+                {/* Title */}
+                <p className="text-sm font-medium text-foreground line-clamp-2 mb-1.5">
+                  {item.title}
+                </p>
+                {/* Meta row: publication · date · link */}
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-[11px] font-semibold text-primary/70">
+                    {item.publication ?? item.source}
+                  </span>
+                  {item.publishedDate && (
+                    <>
+                      <span className="text-muted-foreground/40 text-[10px]">·</span>
+                      <span className="text-[11px] text-muted-foreground font-mono">
+                        {item.publishedDate}
+                      </span>
+                    </>
+                  )}
+                  {item.url && (
                     <a
                       href={item.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm font-medium text-foreground hover:text-primary transition-colors line-clamp-2"
+                      className="ml-auto flex items-center gap-1 text-[10px] text-primary/60 hover:text-primary transition-colors border border-primary/20 hover:border-primary/40 rounded px-1.5 py-0.5"
                     >
-                      {item.title}
+                      <ExternalLink size={9} />
+                      Read article
                     </a>
-                  ) : (
-                    <p className="text-sm font-medium text-foreground line-clamp-2">{item.title}</p>
                   )}
-                  <span className="text-[10px] text-muted-foreground shrink-0 mt-0.5 font-mono">
-                    {item.source}
-                  </span>
                 </div>
                 <p className="text-xs text-muted-foreground leading-relaxed">{item.summary}</p>
               </div>

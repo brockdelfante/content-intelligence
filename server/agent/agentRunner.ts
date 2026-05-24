@@ -66,26 +66,30 @@ async function webSearch(query: string): Promise<{ title: string; link: string; 
 // ─── Step 1: Research Australian news & trends ────────────────────────────────
 
 async function researchNews(baseKeywords: string[]): Promise<{
-  newsItems: { title: string; source: string; summary: string; url?: string }[];
+  newsItems: { title: string; source: string; summary: string; url?: string; publishedDate?: string; publication?: string }[];
   trends: { trend: string; relevance: string }[];
   competitorActivity: { competitor: string; activity: string; topics: string[] }[];
   overallSummary: string;
 }> {
   const keywordSample = baseKeywords.slice(0, 15).join(", ");
 
-  // Fetch real news from web search
+  // Fetch real news from web search (last 14 days)
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - 14);
+  const cutoffStr = cutoffDate.toISOString().split("T")[0];
+
   const searchQueries = [
-    "Australian property finance news today",
-    "RBA interest rate property development Australia",
-    "non-bank lender construction finance Australia",
+    "Australian property finance news site:afr.com OR site:theaustralian.com.au OR site:smh.com.au OR site:abc.net.au",
+    "RBA interest rate property development Australia 2025",
+    "non-bank lender construction finance bridging loan Australia 2025",
   ];
   const searchResults = await Promise.all(searchQueries.map((q) => webSearch(q)));
   const flatResults = searchResults.flat();
   const realNewsContext = flatResults.length > 0
-    ? `Real news search results (use these as the basis for news items):\n${flatResults
-        .map((r) => `- ${r.title} | ${r.snippet} | URL: ${r.link}`)
+    ? `Real news search results (only include items published on or after ${cutoffStr}):\n${flatResults
+        .map((r) => `- TITLE: ${r.title} | SNIPPET: ${r.snippet} | URL: ${r.link}`)
         .join("\n")}`
-    : "No live search results available — use your knowledge of recent Australian property finance news.";
+    : "No live search results available — use your knowledge of recent Australian property finance news from the last 14 days.";
 
   const prompt = `You are a content intelligence analyst specialising in Australian property finance.
 
@@ -95,9 +99,13 @@ ${realNewsContext}
 
 Based on the above real news data and your knowledge, synthesise the following for the Australian property finance sector:
 
-1. **Recent News** (last 24-48 hours): Key news items relevant to: ${keywordSample}
+1. **Recent News** (published within the last 14 days only — cutoff: ${cutoffStr}): Key news items relevant to: ${keywordSample}
    Focus on: RBA decisions, APRA changes, construction finance, development lending, private credit, non-bank lending, property market updates.
-   IMPORTANT: For any news item from the search results above, use the exact URL provided.
+   IMPORTANT RULES:
+   - Only include news published on or after ${cutoffStr}. Exclude anything older.
+   - For each news item, extract the publication name from the URL domain (e.g. afr.com → "Australian Financial Review", abc.net.au → "ABC News", smh.com.au → "Sydney Morning Herald", theaustralian.com.au → "The Australian", realestate.com.au → "realestate.com.au", domain.com.au → "Domain").
+   - Use the exact URL from the search results above where available.
+   - Estimate the published date from the snippet or URL date patterns; if unknown use today's date minus a reasonable estimate (max 14 days ago). Format as YYYY-MM-DD.
 
 2. **Industry Trends**: Emerging trends in Australian property finance, construction lending, private credit, and alternative lending.
 
@@ -106,7 +114,7 @@ Based on the above real news data and your knowledge, synthesise the following f
 Return a JSON object with this exact structure:
 {
   "newsItems": [
-    { "title": "...", "source": "...", "summary": "...", "url": "optional" }
+    { "title": "...", "source": "...", "summary": "...", "url": "https://...", "publishedDate": "YYYY-MM-DD", "publication": "Full Publication Name" }
   ],
   "trends": [
     { "trend": "...", "relevance": "..." }
@@ -134,7 +142,16 @@ Return 5-8 news items, 4-6 trends, 3-5 competitor entries. Be specific and factu
   const rawContent = response.choices[0]?.message?.content;
   const content = typeof rawContent === "string" ? rawContent : "{}";
   try {
-    return JSON.parse(content);
+    const parsed = JSON.parse(content);
+    // Server-side enforcement: discard any news items older than 14 days
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 14);
+    const filteredNews = (parsed.newsItems ?? []).filter((item: any) => {
+      if (!item.publishedDate) return true; // keep if no date (LLM omitted it)
+      const d = new Date(item.publishedDate);
+      return !isNaN(d.getTime()) && d >= cutoff;
+    });
+    return { ...parsed, newsItems: filteredNews };
   } catch {
     return {
       newsItems: [],
@@ -353,11 +370,12 @@ async function generateAndRankTopics(
     score: number;
     topicHash: string;
     sourceDate: Date;
+    sourceNews?: { title: string; publication: string; publishedDate: string; url: string }[];
   }[]
 > {
   const newsContext = newsData.newsItems
-    .slice(0, 5)
-    .map((n) => `- ${n.title} (${n.source})`)
+    .slice(0, 8)
+    .map((n, i) => `[${i}] ${n.title} | ${n.publication ?? n.source} | ${n.publishedDate ?? "recent"} | ${n.url ?? ""}`)
     .join("\n");
   const trendContext = newsData.trends
     .slice(0, 4)
@@ -402,10 +420,12 @@ Return JSON array:
       "Main point or argument to make",
       "Call to action or audience takeaway"
     ],
-    "score": 85.5
+    "score": 85.5,
+    "sourceNewsIndices": [0, 2]
   }
 ]
 
+For "sourceNewsIndices": include the index numbers (from the news list above) of any news items that directly inspired or support this topic. Use [] if no specific news item applies.
 Ensure at least 1-2 "News and Current Events" topics if news is time-sensitive. Sort by score descending.`;
 
   const response = await invokeLLM({
@@ -426,15 +446,30 @@ Ensure at least 1-2 "News and Current Events" topics if news is time-sensitive. 
     const parsed = JSON.parse(content);
     const topicsArray = Array.isArray(parsed) ? parsed : parsed.topics ?? [];
     const now = new Date();
-    return topicsArray.map((t: any) => ({
-      category: t.category ?? "Market Intelligence",
-      topic: t.topic ?? "",
-      keywords: Array.isArray(t.keywords) ? t.keywords : [],
-      brief: Array.isArray(t.brief) ? t.brief : [],
-      score: typeof t.score === "number" ? t.score : 50,
-      topicHash: hashTopic(t.topic ?? ""),
-      sourceDate: now,
-    }));
+    const newsItems = newsData.newsItems;
+    return topicsArray.map((t: any) => {
+      // Map sourceNewsIndices back to full news objects
+      const indices: number[] = Array.isArray(t.sourceNewsIndices) ? t.sourceNewsIndices : [];
+      const sourceNews = indices
+        .filter((i) => i >= 0 && i < newsItems.length)
+        .map((i) => ({
+          title: newsItems[i].title,
+          publication: newsItems[i].publication ?? newsItems[i].source ?? "Unknown",
+          publishedDate: newsItems[i].publishedDate ?? now.toISOString().split("T")[0],
+          url: newsItems[i].url ?? "",
+        }))
+        .filter((n) => n.title);
+      return {
+        category: t.category ?? "Market Intelligence",
+        topic: t.topic ?? "",
+        keywords: Array.isArray(t.keywords) ? t.keywords : [],
+        brief: Array.isArray(t.brief) ? t.brief : [],
+        score: typeof t.score === "number" ? t.score : 50,
+        topicHash: hashTopic(t.topic ?? ""),
+        sourceDate: now,
+        sourceNews: sourceNews.length > 0 ? sourceNews : undefined,
+      };
+    });
   } catch {
     return [];
   }

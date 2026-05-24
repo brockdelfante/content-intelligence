@@ -14,8 +14,10 @@ import {
   ArrowUp,
   ArrowUpDown,
   CheckCircle2,
+  ExternalLink,
   Filter,
   Loader2,
+  Newspaper,
   Search,
   Trash2,
   X,
@@ -308,6 +310,40 @@ export default function TopicQueueTab() {
                       ))}
                     </ul>
                   )}
+                  {/* Source news items */}
+                  {(() => {
+                    const news = (topic as any).sourceNews as { title: string; publication: string; publishedDate: string; url: string }[] | undefined;
+                    if (!news || news.length === 0) return null;
+                    return (
+                      <div className="mt-2 space-y-1">
+                        {news.map((n, i) => (
+                          <div key={i} className="rounded border border-border/50 bg-muted/20 px-2 py-1.5 flex items-start gap-2">
+                            <Newspaper size={10} className="shrink-0 text-primary/40 mt-0.5" />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="text-[10px] font-semibold text-primary/70">{n.publication}</span>
+                                <span className="text-muted-foreground/40 text-[10px]">·</span>
+                                <span className="text-[10px] text-muted-foreground font-mono">{n.publishedDate}</span>
+                              </div>
+                              <p className="text-[10px] text-muted-foreground/80 line-clamp-1 mt-0.5">{n.title}</p>
+                            </div>
+                            {n.url && (
+                              <a
+                                href={n.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="shrink-0 flex items-center gap-1 text-[10px] text-primary/60 hover:text-primary transition-colors border border-primary/20 hover:border-primary/40 rounded px-1.5 py-0.5 bg-primary/5"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <ExternalLink size={8} />
+                                Read
+                              </a>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 {/* Category */}

@@ -39,6 +39,9 @@ export const topics = mysqlTable("topics", {
   publishedSocial: boolean("publishedSocial").default(false).notNull(),
   topicHash: varchar("topicHash", { length: 64 }).notNull(),
   sourceDate: timestamp("sourceDate").defaultNow().notNull(),
+  sourceNews: json("sourceNews")
+    .$type<{ title: string; publication: string; publishedDate: string; url: string }[]>()
+    .default([]),
   removedAt: timestamp("removedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
@@ -53,7 +56,7 @@ export const researchSummaries = mysqlTable("research_summaries", {
   id: int("id").autoincrement().primaryKey(),
   runDate: varchar("runDate", { length: 16 }).notNull().unique(), // YYYY-MM-DD
   newsItems: json("newsItems")
-    .$type<{ title: string; source: string; summary: string; url?: string }[]>()
+    .$type<{ title: string; source: string; summary: string; url?: string; publishedDate?: string; publication?: string }[]>()
     .notNull()
     .default([]),
   trends: json("trends")

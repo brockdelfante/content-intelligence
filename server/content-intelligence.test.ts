@@ -165,3 +165,68 @@ describe("Base keywords", () => {
     expect(trimmed[1]).toBe("Development loan");
   });
 });
+
+// ─── 14-day news filter ───────────────────────────────────────────────────────
+
+describe("News 14-day filter", () => {
+  function filterNewsTo14Days(
+    items: { title: string; publishedDate?: string }[]
+  ) {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 14);
+    return items.filter((item) => {
+      if (!item.publishedDate) return true; // keep if no date
+      const d = new Date(item.publishedDate);
+      return !isNaN(d.getTime()) && d >= cutoff;
+    });
+  }
+
+  it("keeps items with no publishedDate", () => {
+    const items = [{ title: "No date article" }];
+    expect(filterNewsTo14Days(items)).toHaveLength(1);
+  });
+
+  it("keeps items published within the last 14 days", () => {
+    const recent = new Date();
+    recent.setDate(recent.getDate() - 7);
+    const items = [{ title: "Recent article", publishedDate: recent.toISOString().split("T")[0] }];
+    expect(filterNewsTo14Days(items)).toHaveLength(1);
+  });
+
+  it("discards items published more than 14 days ago", () => {
+    const old = new Date();
+    old.setDate(old.getDate() - 20);
+    const items = [{ title: "Old article", publishedDate: old.toISOString().split("T")[0] }];
+    expect(filterNewsTo14Days(items)).toHaveLength(0);
+  });
+
+  it("discards items with invalid date strings", () => {
+    const items = [{ title: "Bad date", publishedDate: "not-a-date" }];
+    // Invalid dates: NaN check should exclude them
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 14);
+    const result = items.filter((item) => {
+      if (!item.publishedDate) return true;
+      const d = new Date(item.publishedDate);
+      return !isNaN(d.getTime()) && d >= cutoff;
+    });
+    expect(result).toHaveLength(0);
+  });
+
+  it("correctly partitions a mixed list", () => {
+    const recent = new Date();
+    recent.setDate(recent.getDate() - 5);
+    const old = new Date();
+    old.setDate(old.getDate() - 30);
+    const items = [
+      { title: "Recent", publishedDate: recent.toISOString().split("T")[0] },
+      { title: "Old", publishedDate: old.toISOString().split("T")[0] },
+      { title: "No date" },
+    ];
+    const result = filterNewsTo14Days(items);
+    expect(result).toHaveLength(2);
+    expect(result.map((i) => i.title)).toContain("Recent");
+    expect(result.map((i) => i.title)).toContain("No date");
+    expect(result.map((i) => i.title)).not.toContain("Old");
+  });
+});

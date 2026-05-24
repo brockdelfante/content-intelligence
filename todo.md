@@ -49,3 +49,10 @@
 - [x] Save checkpoint for publish (version: 6057e4b2)
 - [ ] User clicks Publish button
 - [ ] Create midnight cron after deploy: manus-heartbeat create --name daily-agent --cron "0 0 14 * * *" --path /api/scheduled/daily-agent
+
+## News Enrichment Update
+- [x] Agent: filter news to last 14 days only; add publishedDate, publication, url fields to newsItems
+- [x] Agent: update LLM prompt to return publishedDate, publication, url for each news item
+- [x] DB schema: update research_summaries.newsItems JSON shape to include publishedDate, publication, url
+- [x] Research tab: show date, publication name, and link button for each news item
+- [x] Topic Queue tab: show date, publication name, and link button for each supporting news item

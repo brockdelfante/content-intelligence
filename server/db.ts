@@ -126,6 +126,7 @@ export async function upsertTopic(data: {
   score: number;
   topicHash: string;
   sourceDate: Date;
+  sourceNews?: { title: string; publication: string; publishedDate: string; url: string }[];
 }) {
   const db = await getDb();
   if (!db) return;
@@ -153,16 +154,17 @@ export async function upsertTopic(data: {
     .limit(1);
 
   if (existing.length > 0) {
-    // Update score only if not removed/approved
+    // Update score and sourceNews only if not removed/approved
     if (existing[0].status === "new") {
       await db
         .update(topics)
-        .set({ score: data.score, keywords: data.keywords, brief: data.brief })
+        .set({ score: data.score, keywords: data.keywords, brief: data.brief, sourceNews: data.sourceNews ?? [] })
         .where(eq(topics.topicHash, data.topicHash));
     }
   } else {
     await db.insert(topics).values({
       ...data,
+      sourceNews: data.sourceNews ?? [],
       status: "new",
       publishedBlog: false,
       publishedSocial: false,

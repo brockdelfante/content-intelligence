@@ -184,13 +184,13 @@ export async function listResearchSummaries(limit = 30) {
 
 export async function getResearchSummaryByDate(runDate: string) {
   const db = await getDb();
-  if (!db) return undefined;
+  if (!db) return null;
   const result = await db
     .select()
     .from(researchSummaries)
     .where(eq(researchSummaries.runDate, runDate))
     .limit(1);
-  return result[0];
+  return result[0] ?? null;
 }
 
 export async function upsertResearchSummary(data: {
@@ -352,13 +352,13 @@ export async function updateAgentRun(
 
 export async function getLastAgentRun() {
   const db = await getDb();
-  if (!db) return undefined;
+  if (!db) return null;
   const result = await db
     .select()
     .from(agentRuns)
     .orderBy(desc(agentRuns.createdAt))
     .limit(1);
-  return result[0];
+  return result[0] ?? null;
 }
 
 export async function listAgentRuns(limit = 10) {
@@ -371,13 +371,13 @@ export async function listAgentRuns(limit = 10) {
 
 export async function getConfig(key: string) {
   const db = await getDb();
-  if (!db) return undefined;
+  if (!db) return null;
   const result = await db
     .select()
     .from(appConfig)
     .where(eq(appConfig.key, key))
     .limit(1);
-  return result[0]?.value;
+  return result[0]?.value ?? null;
 }
 
 export async function setConfig(key: string, value: string) {

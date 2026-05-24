@@ -45,7 +45,7 @@
 - [x] Vitest tests: auth logout, topic hashing, scoring, keyword intent, content gap priority, base keywords (11 tests passing)
 
 ## Deployment
-- [ ] Push to GitHub (new private repo)
-- [ ] Save checkpoint for publish
+- [x] Push to GitHub (new private repo: brockdelfante/content-intelligence-hub)
+- [x] Save checkpoint for publish (version: 6057e4b2)
 - [ ] User clicks Publish button
 - [ ] Create midnight cron after deploy: manus-heartbeat create --name daily-agent --cron "0 0 14 * * *" --path /api/scheduled/daily-agent

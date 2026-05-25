@@ -181,7 +181,7 @@ export default function KeywordsTab() {
           ].map(({ label, field }, i) => (
             <div
               key={i}
-              className={`px-3 py-2.5 text-xs font-medium text-muted-foreground flex items-center gap-1 ${
+              className={`px-3 py-2.5 text-sm font-medium text-muted-foreground flex items-center gap-1 ${
                 field ? "cursor-pointer hover:text-foreground select-none" : ""
               }`}
               onClick={() => field && toggleSort(field)}
@@ -213,7 +213,7 @@ export default function KeywordsTab() {
                 className="grid grid-cols-[2fr_120px_100px_100px_80px_1fr] border-b border-border last:border-0 hover:bg-muted/20 transition-colors"
               >
                 <div className="px-3 py-2.5 flex items-center gap-2">
-                  <span className="text-sm text-foreground font-medium">{kw.keyword}</span>
+                  <span className="text-base text-foreground font-medium">{kw.keyword}</span>
                   {kw.trending && (
                     <TrendingUp size={11} className="text-orange-400 shrink-0" />
                   )}
@@ -225,7 +225,7 @@ export default function KeywordsTab() {
                 </div>
                 <div className="px-3 py-2.5 flex items-center">
                   <span
-                    className={`text-[10px] font-medium px-2 py-0.5 rounded-full border ${intentCfg.className}`}
+                    className={`text-xs font-medium px-2 py-0.5 rounded-full border ${intentCfg.className}`}
                   >
                     {intentCfg.label}
                   </span>

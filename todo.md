@@ -73,7 +73,7 @@
 
 
 ## UI Refinements (Current)
-- [ ] Increase font sizes further across dashboard (base font, headings, labels, table text)
-- [ ] Fix table width: constrain to max screen width, reduce category column width
-- [ ] Highlight news-backed topics with faint orange background
-- [ ] Fix remove button overflow issue
+- [x] Increase font sizes further across dashboard (base font, headings, labels, table text)
+- [x] Fix table width: constrain to max screen width, reduce category column width
+- [x] Highlight news-backed topics with faint orange background
+- [x] Fix remove button overflow issue (table now has overflow-x-auto with min-w-full)

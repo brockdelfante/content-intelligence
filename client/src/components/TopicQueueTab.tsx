@@ -260,7 +260,7 @@ export default function TopicQueueTab() {
           ].map(({ label, field }, i) => (
             <div
               key={i}
-              className={`px-3 py-2.5 text-xs font-medium text-muted-foreground ${
+              className={`px-3 py-2.5 text-sm font-medium text-muted-foreground ${
                 field ? "cursor-pointer hover:text-foreground select-none" : ""
               } flex items-center gap-1`}
               onClick={() => field && toggleSort(field)}
@@ -297,7 +297,7 @@ export default function TopicQueueTab() {
               >
                 {/* Topic + keywords + brief */}
                 <div className="px-3 py-3 min-w-0">
-                  <p className="text-sm font-medium text-foreground leading-snug line-clamp-2">
+                  <p className="text-base font-medium text-foreground leading-snug line-clamp-2">
                     {topic.topic}
                   </p>
                   {keywords.length > 0 && (
@@ -305,7 +305,7 @@ export default function TopicQueueTab() {
                       {keywords.slice(0, 3).map((kw, i) => (
                         <span
                           key={i}
-                          className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary/80 font-mono"
+                          className="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary/80 font-mono"
                         >
                           {kw}
                         </span>

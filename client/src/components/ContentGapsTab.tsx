@@ -121,17 +121,17 @@ export default function ContentGapsTab() {
                 className="rounded-lg border border-border bg-card p-4 hover:border-primary/30 transition-colors"
               >
                 <div className="flex items-start justify-between gap-3 mb-2">
-                  <h3 className="text-sm font-semibold text-foreground leading-snug">
+                  <h3 className="text-base font-semibold text-foreground leading-snug">
                     {gap.gapTitle}
                   </h3>
                   <span
-                    className={`text-[10px] font-medium px-2 py-0.5 rounded-full border shrink-0 ${priorityCfg.className}`}
+                    className={`text-xs font-medium px-2 py-0.5 rounded-full border shrink-0 ${priorityCfg.className}`}
                   >
                     {priorityCfg.label}
                   </span>
                 </div>
 
-                <p className="text-xs text-muted-foreground leading-relaxed mb-3">
+                <p className="text-sm text-muted-foreground leading-relaxed mb-3">
                   {gap.gapDescription}
                 </p>
 
@@ -144,7 +144,7 @@ export default function ContentGapsTab() {
                     {keywords.map((kw, i) => (
                       <span
                         key={i}
-                        className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary/80 font-mono"
+                        className="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary/80 font-mono"
                       >
                         {kw}
                       </span>

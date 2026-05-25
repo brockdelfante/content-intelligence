@@ -92,7 +92,7 @@ export default function ResearchTab() {
         <div className="lg:col-span-2 space-y-3">
           <div className="flex items-center gap-2">
             <Newspaper size={14} className="text-primary" />
-            <h3 className="text-sm font-semibold text-foreground">News & Events</h3>
+            <h3 className="text-base font-semibold text-foreground">News & Events</h3>
             <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
               {newsItems.length}
             </Badge>
@@ -142,9 +142,9 @@ export default function ResearchTab() {
         <div className="space-y-4">
           {/* Trends */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <TrendingUp size={14} className="text-primary" />
-              <h3 className="text-sm font-semibold text-foreground">Trends</h3>
+          <div className="flex items-center gap-2">
+            <BarChart2 size={14} className="text-primary" />
+            <h3 className="text-base font-semibold text-foreground">Trends</h3>
             </div>
             <div className="space-y-2">
               {trends.map((t, i) => (
@@ -160,9 +160,9 @@ export default function ResearchTab() {
 
           {/* Competitor activity */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Globe size={14} className="text-primary" />
-              <h3 className="text-sm font-semibold text-foreground">Competitor Activity</h3>
+          <div className="flex items-center gap-2">
+            <TrendingUp size={14} className="text-primary" />
+            <h3 className="text-base font-semibold text-foreground">Competitor Activity</h3>
             </div>
             <div className="space-y-2">
               {competitors.map((c, i) => (

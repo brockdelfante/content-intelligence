@@ -72,30 +72,37 @@ export default function TopicQueueTab() {
   const [sortField, setSortField] = useState<SortField>("score");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
 
-  const { data: topics = [], isLoading } = trpc.topics.list.useQuery(
-    statusFilter !== "all"
-      ? { status: statusFilter as "new" | "approved" | "removed" }
-      : undefined,
+  // Default query excludes removed topics; only include them when explicitly filtered
+  const queryInput = statusFilter === "removed"
+    ? { status: "removed" as const }
+    : statusFilter === "approved"
+    ? { status: "approved" as const }
+    : statusFilter === "new"
+    ? { status: "new" as const }
+    : undefined; // "all" — fetch everything then filter client-side
+
+  const { data: allTopics = [], isLoading } = trpc.topics.list.useQuery(
+    queryInput,
     { refetchInterval: 60_000 }
   );
+
+  // Hide removed topics unless the user explicitly selects the "removed" filter
+  const topics = statusFilter === "removed"
+    ? allTopics
+    : allTopics.filter((t) => t.status !== "removed");
 
   const approveMutation = trpc.topics.approve.useMutation({
     onMutate: async ({ id }) => {
       await utils.topics.list.cancel();
-      const prev = utils.topics.list.getData(
-        statusFilter !== "all" ? { status: statusFilter as any } : undefined
-      );
+      const prev = utils.topics.list.getData(queryInput);
       utils.topics.list.setData(
-        statusFilter !== "all" ? { status: statusFilter as any } : undefined,
+        queryInput,
         (old) => old?.map((t) => (t.id === id ? { ...t, status: "approved" as const } : t))
       );
       return { prev };
     },
     onError: (_err, _vars, ctx) => {
-      utils.topics.list.setData(
-        statusFilter !== "all" ? { status: statusFilter as any } : undefined,
-        ctx?.prev
-      );
+      utils.topics.list.setData(queryInput, ctx?.prev);
       toast.error("Failed to approve topic");
     },
     onSuccess: () => {
@@ -107,20 +114,16 @@ export default function TopicQueueTab() {
   const removeMutation = trpc.topics.remove.useMutation({
     onMutate: async ({ id }) => {
       await utils.topics.list.cancel();
-      const prev = utils.topics.list.getData(
-        statusFilter !== "all" ? { status: statusFilter as any } : undefined
-      );
+      const prev = utils.topics.list.getData(queryInput);
+      // Optimistically remove the topic from the visible list immediately
       utils.topics.list.setData(
-        statusFilter !== "all" ? { status: statusFilter as any } : undefined,
-        (old) => old?.map((t) => (t.id === id ? { ...t, status: "removed" as const } : t))
+        queryInput,
+        (old) => old?.filter((t) => t.id !== id)
       );
       return { prev };
     },
     onError: (_err, _vars, ctx) => {
-      utils.topics.list.setData(
-        statusFilter !== "all" ? { status: statusFilter as any } : undefined,
-        ctx?.prev
-      );
+      utils.topics.list.setData(queryInput, ctx?.prev);
       toast.error("Failed to remove topic");
     },
     onSuccess: () => {
@@ -279,9 +282,7 @@ export default function TopicQueueTab() {
             return (
               <div
                 key={topic.id}
-                className={`grid grid-cols-[2fr_1fr_80px_100px_80px_80px_80px] gap-0 border-b border-border last:border-0 hover:bg-muted/20 transition-colors group ${
-                  topic.status === "removed" ? "opacity-50" : ""
-                }`}
+                className="grid grid-cols-[2fr_1fr_80px_100px_80px_80px_80px] gap-0 border-b border-border last:border-0 hover:bg-muted/20 transition-colors group"
               >
                 {/* Topic + keywords + brief */}
                 <div className="px-3 py-3 min-w-0">

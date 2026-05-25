@@ -19,12 +19,14 @@ import {
   Loader2,
   Newspaper,
   Search,
+  Share2,
   Trash2,
   X,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { trpc } from "../lib/trpc";
+import { SocialSchedulerModal } from "./SocialSchedulerModal";
 
 type SortField = "score" | "category" | "createdAt";
 type SortDir = "asc" | "desc";
@@ -71,6 +73,8 @@ export default function TopicQueueTab() {
   const [search, setSearch] = useState("");
   const [sortField, setSortField] = useState<SortField>("score");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [socialModalOpen, setSocialModalOpen] = useState(false);
+  const [selectedTopicForSocial, setSelectedTopicForSocial] = useState<any>(null);
 
   // Default query excludes removed topics; only include them when explicitly filtered
   const queryInput = statusFilter === "removed"
@@ -90,6 +94,11 @@ export default function TopicQueueTab() {
   const topics = statusFilter === "removed"
     ? allTopics
     : allTopics.filter((t) => t.status !== "removed");
+
+  const handlePostToSocial = (topic: any) => {
+    setSelectedTopicForSocial(topic);
+    setSocialModalOpen(true);
+  };
 
   const approveMutation = trpc.topics.approve.useMutation({
     onMutate: async ({ id }) => {
@@ -400,6 +409,17 @@ export default function TopicQueueTab() {
 
                 {/* Actions */}
                 <div className="px-3 py-3 flex items-center gap-1">
+                  {topic.status !== "removed" && (
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-6 w-6 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
+                      onClick={() => handlePostToSocial(topic)}
+                      title="Post to Social"
+                    >
+                      <Share2 size={13} />
+                    </Button>
+                  )}
                   {topic.status !== "approved" && topic.status !== "removed" && (
                     <Button
                       size="icon"
@@ -430,6 +450,18 @@ export default function TopicQueueTab() {
           })
         )}
       </div>
+
+      {/* Social Scheduler Modal */}
+      {selectedTopicForSocial && (
+        <SocialSchedulerModal
+          isOpen={socialModalOpen}
+          onClose={() => {
+            setSocialModalOpen(false);
+            setSelectedTopicForSocial(null);
+          }}
+          topic={selectedTopicForSocial}
+        />
+      )}
 
       {/* Legend */}
       <div className="flex items-center gap-4 text-xs text-muted-foreground pt-1">

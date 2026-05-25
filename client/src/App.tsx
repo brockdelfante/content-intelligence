@@ -20,9 +20,9 @@ function Router() {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="dark">
+      <ThemeProvider defaultTheme="light" switchable>
         <TooltipProvider>
-          <Toaster theme="dark" position="bottom-right" />
+          <Toaster theme="light" position="bottom-right" />
           <Router />
         </TooltipProvider>
       </ThemeProvider>

@@ -1,9 +1,11 @@
 import { COOKIE_NAME } from "@shared/const";
+import type { TrpcContext } from "./_core/context";
 import { z } from "zod";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import { runDailyAgent } from "./agent/agentRunner";
+import { invokeLLM } from "./_core/llm";
 import {
   approveTopic,
   getLastAgentRun,
@@ -106,6 +108,126 @@ const agentRouter = router({
     .query(({ input }) => listAgentRuns(input?.limit ?? 10)),
 });
 
+// ─── Social Router ────────────────────────────────────────────────────────────
+
+const socialRouter = router({
+  generateCaptions: protectedProcedure
+    .input(
+      z.object({
+        topic: z.string(),
+        keywords: z.array(z.string()),
+        brief: z.array(z.string()),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const prompt = `Generate 3 compelling social media captions for the following Australian property finance topic. Each caption should be 1-2 sentences, engaging, and suitable for LinkedIn or Twitter. Include relevant hashtags.
+
+Topic: ${input.topic}
+Keywords: ${input.keywords.join(", ")}
+Brief: ${input.brief.join(" ")}
+
+Return as JSON array with 'caption' field for each.`;
+
+      const response = await invokeLLM({
+        messages: [
+          {
+            role: "system",
+            content: "You are a social media expert for Australian property finance. Generate engaging captions.",
+          },
+          { role: "user", content: prompt },
+        ],
+        response_format: {
+          type: "json_schema",
+          json_schema: {
+            name: "social_captions",
+            strict: true,
+            schema: {
+              type: "object",
+              properties: {
+                captions: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      caption: { type: "string" },
+                    },
+                    required: ["caption"],
+                    additionalProperties: false,
+                  },
+                },
+              },
+              required: ["captions"],
+              additionalProperties: false,
+            },
+          },
+        },
+      });
+
+      const content = response.choices[0]?.message.content;
+      if (!content) throw new Error("No captions generated");
+      const contentStr = typeof content === "string" ? content : JSON.stringify(content);
+      const parsed = JSON.parse(contentStr);
+      return parsed.captions || [];
+    }),
+
+  getHubSpotAccounts: protectedProcedure.query(async () => {
+    const apiKey = process.env.HUBSPOT_API_KEY;
+    if (!apiKey) return [];
+
+    try {
+      const res = await fetch("https://api.hubapi.com/crm/v3/objects/social_channel", {
+        headers: { Authorization: `Bearer ${apiKey}` },
+      });
+      if (!res.ok) return [];
+      const data = (await res.json()) as { results?: Array<{ id: string; properties: Record<string, unknown> }> };
+      return (
+        data.results?.map((r) => ({
+          id: r.id,
+          name: (r.properties.channel_name as string) || r.id,
+        })) || []
+      );
+    } catch {
+      return [];
+    }
+  }),
+
+  schedulePost: protectedProcedure
+    .input(
+      z.object({
+        accountId: z.string(),
+        caption: z.string(),
+        scheduledTime: z.string(), // ISO 8601
+      })
+    )
+    .mutation(async ({ input }) => {
+      const apiKey = process.env.HUBSPOT_API_KEY;
+      if (!apiKey) throw new Error("HubSpot API key not configured");
+
+      const res = await fetch("https://api.hubapi.com/crm/v3/objects/social_post", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          properties: {
+            hs_social_channel: input.accountId,
+            hs_social_body: input.caption,
+            hs_publish_date: new Date(input.scheduledTime).getTime(),
+            hs_social_is_scheduled: "true",
+          },
+        }),
+      });
+
+      if (!res.ok) {
+        const err = (await res.json()) as { message?: string };
+        throw new Error(`HubSpot API error: ${err.message || "Unknown error"}`);
+      }
+
+      return { success: true, message: "Post scheduled successfully" };
+    }),
+});
+
 // ─── App Router ───────────────────────────────────────────────────────────────
 
 export const appRouter = router({
@@ -126,6 +248,7 @@ export const appRouter = router({
   contentGaps: contentGapsRouter,
   baseKeywords: baseKeywordsRouter,
   agent: agentRouter,
+  social: socialRouter,
 });
 
 export type AppRouter = typeof appRouter;

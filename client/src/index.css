@@ -109,13 +109,13 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground font-sans antialiased text-base;
+    @apply bg-background text-foreground font-sans antialiased text-lg;
   }
-  h1 { @apply text-2xl font-bold; }
-  h2 { @apply text-xl font-semibold; }
-  h3 { @apply text-lg font-semibold; }
-  p { @apply text-base; }
-  label { @apply text-sm; }
+  h1 { @apply text-4xl font-bold; }
+  h2 { @apply text-2xl font-semibold; }
+  h3 { @apply text-xl font-semibold; }
+  p { @apply text-lg; }
+  label { @apply text-base; }
 }
 
 .dark {

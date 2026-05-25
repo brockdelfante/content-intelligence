@@ -46,8 +46,8 @@
 
 ## Deployment
 - [x] Push to GitHub (new private repo: brockdelfante/content-intelligence-hub)
-- [x] Save checkpoint for publish (version: 6057e4b2)
-- [ ] User clicks Publish button
+- [x] Save checkpoint for publish (version: c6cef7b5 - latest)
+- [ ] User clicks Publish button in Management UI
 - [ ] Create midnight cron after deploy: manus-heartbeat create --name daily-agent --cron "0 0 14 * * *" --path /api/scheduled/daily-agent
 
 ## News Enrichment Update
@@ -70,3 +70,10 @@
 - [x] Frontend: Social scheduler modal with caption selection, account picker, date/time picker
 - [x] Frontend: Schedule button that calls HubSpot API and closes modal
 - [x] Tests: caption generation, HubSpot account fetch, post scheduling
+
+
+## UI Refinements (Current)
+- [ ] Increase font sizes further across dashboard (base font, headings, labels, table text)
+- [ ] Fix table width: constrain to max screen width, reduce category column width
+- [ ] Highlight news-backed topics with faint orange background
+- [ ] Fix remove button overflow issue

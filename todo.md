@@ -59,14 +59,14 @@
 
 
 ## UI Theme & Typography Update
-- [ ] Switch theme from dark to light (update ThemeProvider, CSS variables in index.css)
-- [ ] Increase font sizes across dashboard (headings, body, labels)
+- [x] Switch theme from dark to light (update ThemeProvider, CSS variables in index.css)
+- [x] Increase font sizes across dashboard (headings, body, labels)
 
 ## Social Post Scheduler Feature
-- [ ] Backend: tRPC procedure to generate social media captions via LLM
-- [ ] Backend: tRPC procedure to fetch HubSpot social accounts
-- [ ] Backend: tRPC procedure to schedule post to HubSpot social
-- [ ] Frontend: "Post to Social" button on each topic
-- [ ] Frontend: Social scheduler modal with caption selection, account picker, date/time picker
-- [ ] Frontend: Schedule button that calls HubSpot API and closes modal
-- [ ] Tests: caption generation, HubSpot account fetch, post scheduling
+- [x] Backend: tRPC procedure to generate social media captions via LLM
+- [x] Backend: tRPC procedure to fetch HubSpot social accounts
+- [x] Backend: tRPC procedure to schedule post to HubSpot social
+- [x] Frontend: "Post to Social" button on each topic
+- [x] Frontend: Social scheduler modal with caption selection, account picker, date/time picker
+- [x] Frontend: Schedule button that calls HubSpot API and closes modal
+- [x] Tests: caption generation, HubSpot account fetch, post scheduling

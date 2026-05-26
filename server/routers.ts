@@ -3,7 +3,7 @@ import type { TrpcContext } from "./_core/context";
 import { z } from "zod";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
+import { publicProcedure, router } from "./_core/trpc";
 import { runDailyAgent } from "./agent/agentRunner";
 import { invokeLLM } from "./_core/llm";
 import {
@@ -23,7 +23,7 @@ import {
 // ─── Topics Router ────────────────────────────────────────────────────────────
 
 const topicsRouter = router({
-  list: protectedProcedure
+  list: publicProcedure
     .input(
       z.object({
         status: z.enum(["new", "approved", "removed"]).optional(),
@@ -32,15 +32,15 @@ const topicsRouter = router({
     )
     .query(({ input }) => listTopics(input)),
 
-  approve: protectedProcedure
+  approve: publicProcedure
     .input(z.object({ id: z.number() }))
     .mutation(({ input }) => approveTopic(input.id)),
 
-  remove: protectedProcedure
+  remove: publicProcedure
     .input(z.object({ id: z.number() }))
     .mutation(({ input }) => removeTopic(input.id)),
 
-  updatePublished: protectedProcedure
+  updatePublished: publicProcedure
     .input(
       z.object({
         id: z.number(),
@@ -54,7 +54,7 @@ const topicsRouter = router({
 // ─── Research Router ──────────────────────────────────────────────────────────
 
 const researchRouter = router({
-  list: protectedProcedure
+  list: publicProcedure
     .input(z.object({ limit: z.number().min(1).max(90).optional() }).optional())
     .query(({ input }) => listResearchSummaries(input?.limit ?? 30)),
 });
@@ -62,7 +62,7 @@ const researchRouter = router({
 // ─── Keywords Router ──────────────────────────────────────────────────────────
 
 const keywordsRouter = router({
-  list: protectedProcedure
+  list: publicProcedure
     .input(z.object({ isBase: z.boolean().optional() }).optional())
     .query(({ input }) => listKeywords(input?.isBase)),
 });
@@ -70,7 +70,7 @@ const keywordsRouter = router({
 // ─── Content Gaps Router ──────────────────────────────────────────────────────
 
 const contentGapsRouter = router({
-  list: protectedProcedure
+  list: publicProcedure
     .input(z.object({ limit: z.number().min(1).max(100).optional() }).optional())
     .query(({ input }) => listContentGaps(input?.limit ?? 50)),
 });
@@ -78,9 +78,9 @@ const contentGapsRouter = router({
 // ─── Base Keywords Router ─────────────────────────────────────────────────────
 
 const baseKeywordsRouter = router({
-  list: protectedProcedure.query(() => listBaseKeywords()),
+  list: publicProcedure.query(() => listBaseKeywords()),
 
-  save: protectedProcedure
+  save: publicProcedure
     .input(z.object({ keywords: z.array(z.string()).max(40) }))
     .mutation(({ input }) => saveBaseKeywords(input.keywords)),
 });
@@ -88,7 +88,7 @@ const baseKeywordsRouter = router({
 // ─── Agent Router ─────────────────────────────────────────────────────────────
 
 const agentRouter = router({
-  triggerRun: protectedProcedure.mutation(async () => {
+  triggerRun: publicProcedure.mutation(async () => {
     const hubspotKey = process.env.HUBSPOT_API_KEY;
     // Run with a 110s timeout guard (Cloud Run limit is 180s, leave buffer)
     const timeout = new Promise<{ started: boolean; message: string }>((resolve) =>
@@ -101,9 +101,9 @@ const agentRouter = router({
     return Promise.race([run, timeout]);
   }),
 
-  getLastRun: protectedProcedure.query(() => getLastAgentRun()),
+  getLastRun: publicProcedure.query(() => getLastAgentRun()),
 
-  listRuns: protectedProcedure
+  listRuns: publicProcedure
     .input(z.object({ limit: z.number().min(1).max(30).optional() }).optional())
     .query(({ input }) => listAgentRuns(input?.limit ?? 10)),
 });
@@ -111,7 +111,7 @@ const agentRouter = router({
 // ─── Social Router ────────────────────────────────────────────────────────────
 
 const socialRouter = router({
-  generateCaptions: protectedProcedure
+  generateCaptions: publicProcedure
     .input(
       z.object({
         topic: z.string(),
@@ -170,7 +170,7 @@ Return as JSON array with 'caption' field for each.`;
       return parsed.captions || [];
     }),
 
-  getHubSpotAccounts: protectedProcedure.query(async () => {
+  getHubSpotAccounts: publicProcedure.query(async () => {
     const apiKey = process.env.HUBSPOT_API_KEY;
     if (!apiKey) return [];
 
@@ -191,7 +191,7 @@ Return as JSON array with 'caption' field for each.`;
     }
   }),
 
-  schedulePost: protectedProcedure
+  schedulePost: publicProcedure
     .input(
       z.object({
         accountId: z.string(),

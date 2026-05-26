@@ -44,11 +44,11 @@
 ## Testing
 - [x] Vitest tests: auth logout, topic hashing, scoring, keyword intent, content gap priority, base keywords (11 tests passing)
 
-## Deployment
+## Deployment (Next Steps)
 - [x] Push to GitHub (new private repo: brockdelfante/content-intelligence-hub)
-- [x] Save checkpoint for publish (version: c6cef7b5 - latest)
-- [ ] User clicks Publish button in Management UI
-- [ ] Create midnight cron after deploy: manus-heartbeat create --name daily-agent --cron "0 0 14 * * *" --path /api/scheduled/daily-agent
+- [x] Save checkpoint for publish (version: 762750aa - latest with UI refinements)
+- [ ] User clicks Publish button in Management UI to deploy
+- [ ] After deploy: Create midnight cron: manus-heartbeat create --name daily-agent --cron "0 0 14 * * *" --path /api/scheduled/daily-agent
 
 ## News Enrichment Update
 - [x] Agent: filter news to last 14 days only; add publishedDate, publication, url fields to newsItems
@@ -77,3 +77,12 @@
 - [x] Fix table width: constrain to max screen width, reduce category column width
 - [x] Highlight news-backed topics with faint orange background
 - [x] Fix remove button overflow issue (table now has overflow-x-auto with min-w-full)
+
+
+## Auth Removal
+- [x] Remove Manus OAuth from App.tsx and DashboardLayout
+- [x] Remove auth check from Dashboard page
+- [x] Update tRPC procedures: change protectedProcedure to publicProcedure where applicable
+- [x] Remove useAuth hook calls from components
+- [x] Remove login/logout buttons and user profile display
+- [x] Update Home.tsx to redirect directly to Dashboard (no login page)

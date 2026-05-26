@@ -1,7 +1,6 @@
-import { useAuth } from "@/_core/hooks/useAuth";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getLoginUrl } from "@/const";
 import {
   BarChart2,
   BookOpen,
@@ -9,7 +8,7 @@ import {
   Key,
   Layers,
   Loader2,
-  LogOut,
+
   Play,
   RefreshCw,
   Search,
@@ -61,7 +60,6 @@ const NAV_ITEMS: { id: Tab; label: string; icon: React.ReactNode; description: s
 ];
 
 export default function Dashboard() {
-  const { user, loading, isAuthenticated, logout } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>("queue");
 
   const triggerAgent = trpc.agent.triggerRun.useMutation({
@@ -74,39 +72,6 @@ export default function Dashboard() {
       toast.error("Failed to start agent", { description: err.message });
     },
   });
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="animate-spin text-primary" size={32} />
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-6 max-w-md px-6">
-          <div className="space-y-2">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Zap size={28} className="text-primary" />
-              <span className="text-2xl font-semibold text-foreground">Content Intelligence</span>
-            </div>
-            <p className="text-muted-foreground text-sm leading-relaxed">
-              AI-powered content research and topic queue management for Australian property finance.
-            </p>
-          </div>
-          <Button
-            size="lg"
-            className="w-full"
-            onClick={() => (window.location.href = getLoginUrl())}
-          >
-            Sign in to continue
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   const activeItem = NAV_ITEMS.find((n) => n.id === activeTab);
 
@@ -169,29 +134,7 @@ export default function Dashboard() {
           </Button>
         </div>
 
-        {/* User */}
-        <div className="p-3 border-t border-sidebar-border">
-          <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
-              <span className="text-xs font-semibold text-primary">
-                {(user?.name ?? user?.email ?? "U")[0].toUpperCase()}
-              </span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-sidebar-foreground truncate">
-                {user?.name ?? user?.email ?? "User"}
-              </p>
-              <p className="text-[10px] text-sidebar-foreground/40 truncate">{user?.email ?? ""}</p>
-            </div>
-            <button
-              onClick={() => logout()}
-              className="shrink-0 text-sidebar-foreground/30 hover:text-sidebar-foreground/70 transition-colors"
-              title="Sign out"
-            >
-              <LogOut size={13} />
-            </button>
-          </div>
-        </div>
+
       </aside>
 
       {/* Main content */}

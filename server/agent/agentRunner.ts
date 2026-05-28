@@ -271,14 +271,15 @@ async function analyseHubSpotGaps(
       let socialTopics: string[] = [];
       try {
         const socialRes = await fetch(
-          "https://api.hubapi.com/broadcast/v1/broadcasts?count=100",
+          "https://api.hubapi.com/broadcast/v1/broadcasts?limit=100",
           { headers: { Authorization: `Bearer ${hubspotApiKey}` } }
         );
         if (socialRes.ok) {
-          const socialData = (await socialRes.json()) as any[];
-          if (Array.isArray(socialData)) {
-            socialTopics = socialData
-              .map((b: any) => b.content?.body ?? b.message ?? "")
+          const socialData = (await socialRes.json()) as any;
+          const broadcasts = Array.isArray(socialData) ? socialData : (socialData.broadcasts || []);
+          if (Array.isArray(broadcasts)) {
+            socialTopics = broadcasts
+              .map((b: any) => b.content?.body ?? b.content?.originalBody ?? b.message ?? "")
               .filter((s: string) => s.length > 10)
               .slice(0, 100);
           }

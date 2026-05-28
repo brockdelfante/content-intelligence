@@ -89,6 +89,6 @@
 
 
 ## Content Gaps Summary Card
-- [ ] Add summary card at top of Content Gaps tab showing LinkedIn posts and blog articles analysed
-- [ ] Display count of LinkedIn posts and blog articles
-- [ ] Show 2 most recent titles from each source
+- [x] Add summary card at top of Content Gaps tab showing published content analysed
+- [x] Display count of HubSpot posts analysed
+- [x] Show informational message about agent data tracking

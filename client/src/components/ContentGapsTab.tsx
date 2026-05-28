@@ -53,7 +53,17 @@ export default function ContentGapsTab() {
     <div className="space-y-4">
       {/* Published Content Summary */}
       <div className="rounded-lg border border-border bg-card p-4">
-        <h3 className="text-base font-semibold text-foreground mb-2">Published Content Analysed</h3>
+        <h3 className="text-base font-semibold text-foreground mb-3">Published Content Analysed</h3>
+        <div className="grid grid-cols-2 gap-4 mb-3">
+          <div>
+            <p className="text-xs text-muted-foreground mb-1">Total Posts Analysed</p>
+            <p className="text-2xl font-bold text-foreground">{latestPostsAnalyzed}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground mb-1">Latest Run Date</p>
+            <p className="text-sm font-semibold text-foreground">{gaps[0]?.runDate || "—"}</p>
+          </div>
+        </div>
         <p className="text-sm text-muted-foreground">The agent analyses your HubSpot blog posts and social broadcasts to identify content gaps. Run the agent to populate this data.</p>
       </div>
 

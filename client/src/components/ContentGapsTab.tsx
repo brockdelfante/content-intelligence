@@ -49,9 +49,14 @@ export default function ContentGapsTab() {
   const medCount = gaps.filter((g) => g.priority === "medium").length;
   const lowCount = gaps.filter((g) => g.priority === "low").length;
   const latestPostsAnalyzed = gaps[0]?.hubspotPostsAnalyzed ?? 0;
-
   return (
     <div className="space-y-4">
+      {/* Published Content Summary */}
+      <div className="rounded-lg border border-border bg-card p-4">
+        <h3 className="text-base font-semibold text-foreground mb-2">Published Content Analysed</h3>
+        <p className="text-sm text-muted-foreground">The agent analyses your HubSpot blog posts and social broadcasts to identify content gaps. Run the agent to populate this data.</p>
+      </div>
+
       {/* Stats */}
       <div className="grid grid-cols-4 gap-3">
         {[

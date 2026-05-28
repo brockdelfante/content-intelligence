@@ -86,3 +86,9 @@
 - [x] Remove useAuth hook calls from components
 - [x] Remove login/logout buttons and user profile display
 - [x] Update Home.tsx to redirect directly to Dashboard (no login page)
+
+
+## Content Gaps Summary Card
+- [ ] Add summary card at top of Content Gaps tab showing LinkedIn posts and blog articles analysed
+- [ ] Display count of LinkedIn posts and blog articles
+- [ ] Show 2 most recent titles from each source

@@ -238,16 +238,21 @@ async function analyseHubSpotGaps(
     category: string;
   }[];
   postsAnalyzed: number;
+  blogPostsCount: number;
+  socialPostsCount: number;
+  recentBlogTitles: string[];
+  recentSocialTitles: string[];
 }> {
   let publishedTopics: string[] = [];
   let postsAnalyzed = 0;
+  let allPosts: any[] = [];
+  let socialTopics: string[] = [];
 
   // Fetch HubSpot blog posts + social broadcasts if API key available
   if (hubspotApiKey) {
     try {
       // 1. Blog posts (paginated, up to 200)
       let after: string | undefined;
-      let allPosts: any[] = [];
       for (let page = 0; page < 4; page++) {
         const url = new URL("https://api.hubapi.com/cms/v3/blogs/posts");
         url.searchParams.set("limit", "50");
@@ -268,7 +273,6 @@ async function analyseHubSpotGaps(
         .filter(Boolean);
 
       // 2. Social broadcasts (published social posts)
-      let socialTopics: string[] = [];
       try {
         const socialRes = await fetch(
           "https://api.hubapi.com/broadcast/v1/broadcasts?limit=100",
@@ -350,9 +354,23 @@ Return JSON:
   const content = typeof rawContent3 === "string" ? rawContent3 : "{}";
   try {
     const parsed = JSON.parse(content);
-    return { gaps: parsed.gaps ?? [], postsAnalyzed };
+    return {
+      gaps: parsed.gaps ?? [],
+      postsAnalyzed,
+      blogPostsCount: allPosts?.length ?? 0,
+      socialPostsCount: socialTopics?.length ?? 0,
+      recentBlogTitles: (allPosts ?? []).slice(0, 2).map((p: any) => p.name ?? p.htmlTitle ?? "").filter(Boolean),
+      recentSocialTitles: (socialTopics ?? []).slice(0, 2),
+    };
   } catch {
-    return { gaps: [], postsAnalyzed };
+    return {
+      gaps: [],
+      postsAnalyzed,
+      blogPostsCount: allPosts?.length ?? 0,
+      socialPostsCount: socialTopics?.length ?? 0,
+      recentBlogTitles: (allPosts ?? []).slice(0, 2).map((p: any) => p.name ?? p.htmlTitle ?? "").filter(Boolean),
+      recentSocialTitles: (socialTopics ?? []).slice(0, 2),
+    };
   }
 }
 

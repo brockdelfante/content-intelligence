@@ -1,4 +1,3 @@
-import { COOKIE_NAME } from "@shared/const";
 import type { TrpcContext } from "./_core/context";
 import { z } from "zod";
 import { getSessionCookieOptions } from "./_core/cookies";
@@ -6,6 +5,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { runDailyAgent } from "./agent/agentRunner";
 import { invokeLLM } from "./_core/llm";
+import { COOKIE_NAME } from "../shared/const";
 import {
   approveTopic,
   clearUserTopics,
@@ -281,8 +281,8 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         const prompt =
           input.topicType === "social"
-            ? `Given this news article, generate 5 compelling social media post topics/titles that would resonate on LinkedIn. Each should be 5-12 words, actionable, and leverage the news angle. Return as JSON array of strings: ["topic1", "topic2", ...]. Article: ${input.newsTitle} - ${input.newsContent}`
-            : `Given this news article, generate 5 blog article topics/titles that would provide in-depth analysis. Each should be 8-15 words, SEO-friendly, and position the content as authoritative. Return as JSON array of strings: ["topic1", "topic2", ...]. Article: ${input.newsTitle} - ${input.newsContent}`;
+            ? `Generate 5 compelling social media post topics/titles that would resonate on LinkedIn. Each should be 5-12 words, actionable, and leverage the news angle. Article: ${input.newsTitle} - ${input.newsContent}`
+            : `Generate 5 blog article topics/titles that would provide in-depth analysis. Each should be 8-15 words, SEO-friendly, and position the content as authoritative. Article: ${input.newsTitle} - ${input.newsContent}`;
 
         const response = await invokeLLM({
           messages: [
@@ -292,12 +292,34 @@ export const appRouter = router({
             },
             { role: "user", content: prompt },
           ],
+          response_format: {
+            type: "json_schema",
+            json_schema: {
+              name: "topic_suggestions",
+              strict: true,
+              schema: {
+                type: "object",
+                properties: {
+                  topics: {
+                    type: "array",
+                    items: { type: "string" },
+                    minItems: 5,
+                    maxItems: 5,
+                  },
+                },
+                required: ["topics"],
+                additionalProperties: false,
+              },
+            },
+          },
         });
 
-        const content = (response.choices[0]?.message.content || "[]") as string;
+        const content = response.choices[0]?.message.content;
+        if (!content) return [];
+        const contentStr = typeof content === "string" ? content : JSON.stringify(content);
         try {
-          const topics = JSON.parse(content);
-          return Array.isArray(topics) ? topics.slice(0, 5) : [];
+          const parsed = JSON.parse(contentStr);
+          return Array.isArray(parsed.topics) ? parsed.topics.slice(0, 5) : [];
         } catch {
           return [];
         }

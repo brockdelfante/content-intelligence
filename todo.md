@@ -97,8 +97,8 @@
 ## Topic Generation & My Topics Feature
 - [x] DB schema: add user_topics table (id, topicType, topicTitle, newsSourceId, createdAt)
 - [x] DB helpers: saveUserTopic, listUserTopics, deleteUserTopic, clearUserTopics
-- [ ] Agent: generate 5 blog topic suggestions from each news article
-- [ ] Agent: generate 5 social topic suggestions from each news article
+- [x] Agent: generate 5 topic suggestions from each news article (via LLM in generateSuggestions)
+- [x] Agent: generate 5 social topic suggestions from each news article (via LLM in generateSuggestions)
 - [x] tRPC: userTopics.generateSuggestions (returns 5 suggestions for a news article)
 - [x] tRPC: userTopics.save (saves selected topic to user_topics table)
 - [x] tRPC: userTopics.list (returns all saved topics, grouped by type)
@@ -106,7 +106,7 @@
 - [x] tRPC: userTopics.clear (clears all topics of a type)
 - [x] Frontend: TopicSuggestionModal component (Social and Article variants)
 - [x] Frontend: "Social Post" and "Article Post" buttons on Topic Queue rows
-- [x] Frontend: My Topics tab with two-column spreadsheet (Social / Article)
+- [x] Frontend: My Topics tab with two-column spreadsheet layout (Social / Article columns side-by-side)
 - [x] Frontend: Copy and Clear buttons for each column in My Topics
 - [x] Frontend: Refresh button in modals to generate 5 new suggestions
-- [ ] Tests: topic generation, user topic CRUD, modal interactions
+- [x] Tests: topic generation, user topic CRUD, modal interactions (19 tests passing)

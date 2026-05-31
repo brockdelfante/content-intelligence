@@ -262,7 +262,7 @@ export default function TopicQueueTab() {
       {/* Table */}
       <div className="rounded-lg border border-border overflow-x-auto max-w-full">
         {/* Header */}
-        <div className="grid grid-cols-[2fr_0.6fr_80px_100px_80px_80px_80px] gap-0 bg-muted/30 border-b border-border min-w-full">
+        <div className="grid grid-cols-[2fr_0.6fr_80px_100px_80px_80px_80px] gap-0 bg-muted/30 border-b border-border min-w-full pr-4">
           {[
             { label: "Topic", field: "score" as SortField, colSpan: "" },
             { label: "Category", field: "category" as SortField },
@@ -305,7 +305,7 @@ export default function TopicQueueTab() {
             return (
               <div
                 key={topic.id}
-                className={`grid grid-cols-[2fr_0.6fr_80px_100px_80px_80px_80px] gap-0 border-b border-border last:border-0 hover:bg-muted/20 transition-colors group ${
+                className={`grid grid-cols-[2fr_0.6fr_80px_100px_80px_80px_80px] gap-0 border-b border-border last:border-0 hover:bg-muted/20 transition-colors group pr-4 ${
                   topic.sourceNews && topic.sourceNews.length > 0 ? "bg-orange-50/50" : ""
                 }`}
               >

@@ -46,7 +46,7 @@
 
 ## Deployment (Next Steps)
 - [x] Push to GitHub (new private repo: brockdelfante/content-intelligence-hub)
-- [x] Save checkpoint for publish (version: 762750aa - latest with UI refinements)
+- [x] Save checkpoint for publish (version: 29c3b92e - final with all features)
 - [ ] User clicks Publish button in Management UI to deploy
 - [ ] After deploy: Create midnight cron: manus-heartbeat create --name daily-agent --cron "0 0 14 * * *" --path /api/scheduled/daily-agent
 
@@ -92,3 +92,20 @@
 - [x] Add summary card at top of Content Gaps tab showing published content analysed
 - [x] Display count of HubSpot posts analysed
 - [x] Show informational message about agent data tracking
+
+
+## Topic Generation & My Topics Feature
+- [ ] DB schema: add user_topics table (id, topicType, topicTitle, newsSourceId, createdAt)
+- [ ] DB helpers: saveUserTopic, listUserTopics, deleteUserTopic, clearUserTopics
+- [ ] Agent: generate 5 blog topic suggestions from each news article
+- [ ] Agent: generate 5 social topic suggestions from each news article
+- [ ] tRPC: social.generateTopicSuggestions (returns 5 suggestions for a news article)
+- [ ] tRPC: article.generateTopicSuggestions (returns 5 suggestions for a news article)
+- [ ] tRPC: topics.saveUserTopic (saves selected topic to user_topics table)
+- [ ] tRPC: topics.listUserTopics (returns all saved topics, grouped by type)
+- [ ] Frontend: TopicSuggestionModal component (Social and Article variants)
+- [ ] Frontend: "Social Post" and "Article Post" buttons on Topic Queue rows
+- [ ] Frontend: My Topics tab with two-column spreadsheet (Social / Article)
+- [ ] Frontend: Copy and Clear buttons for each column in My Topics
+- [ ] Frontend: Refresh button in modals to generate 5 new suggestions
+- [ ] Tests: topic generation, user topic CRUD, modal interactions

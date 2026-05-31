@@ -27,6 +27,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { trpc } from "../lib/trpc";
 import { SocialSchedulerModal } from "./SocialSchedulerModal";
+import { TopicSuggestionModal } from "./TopicSuggestionModal";
 
 type SortField = "score" | "category" | "createdAt";
 type SortDir = "asc" | "desc";
@@ -75,6 +76,9 @@ export default function TopicQueueTab() {
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [socialModalOpen, setSocialModalOpen] = useState(false);
   const [selectedTopicForSocial, setSelectedTopicForSocial] = useState<any>(null);
+  const [articleSuggestionOpen, setArticleSuggestionOpen] = useState(false);
+  const [socialSuggestionOpen, setSocialSuggestionOpen] = useState(false);
+  const [selectedNewsForSuggestion, setSelectedNewsForSuggestion] = useState<any>(null);
 
   // Default query excludes removed topics; only include them when explicitly filtered
   const queryInput = statusFilter === "removed"
@@ -98,6 +102,16 @@ export default function TopicQueueTab() {
   const handlePostToSocial = (topic: any) => {
     setSelectedTopicForSocial(topic);
     setSocialModalOpen(true);
+  };
+
+  const handleOpenArticleSuggestions = (topic: any) => {
+    setSelectedNewsForSuggestion(topic);
+    setArticleSuggestionOpen(true);
+  };
+
+  const handleOpenSocialSuggestions = (topic: any) => {
+    setSelectedNewsForSuggestion(topic);
+    setSocialSuggestionOpen(true);
   };
 
   const approveMutation = trpc.topics.approve.useMutation({
@@ -410,17 +424,37 @@ export default function TopicQueueTab() {
                 </div>
 
                 {/* Actions */}
-                <div className="px-3 py-3 flex items-center gap-1">
+                <div className="px-3 py-3 flex items-center gap-1 flex-wrap">
                   {topic.status !== "removed" && (
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-6 w-6 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
-                      onClick={() => handlePostToSocial(topic)}
-                      title="Post to Social"
-                    >
-                      <Share2 size={13} />
-                    </Button>
+                    <>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-6 text-[11px] px-2"
+                        onClick={() => handleOpenArticleSuggestions(topic)}
+                        title="Generate article topics"
+                      >
+                        Article Post
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-6 text-[11px] px-2"
+                        onClick={() => handleOpenSocialSuggestions(topic)}
+                        title="Generate social topics"
+                      >
+                        Social Post
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-6 w-6 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
+                        onClick={() => handlePostToSocial(topic)}
+                        title="Schedule social post"
+                      >
+                        <Share2 size={13} />
+                      </Button>
+                    </>
                   )}
                   {topic.status !== "approved" && topic.status !== "removed" && (
                     <Button
@@ -452,6 +486,26 @@ export default function TopicQueueTab() {
           })
         )}
       </div>
+
+      {/* Topic Suggestion Modals */}
+      {selectedNewsForSuggestion && (
+        <>
+          <TopicSuggestionModal
+            open={articleSuggestionOpen}
+            onOpenChange={setArticleSuggestionOpen}
+            newsTitle={selectedNewsForSuggestion.topic}
+            newsContent={selectedNewsForSuggestion.brief?.join(" ") || ""}
+            topicType="article"
+          />
+          <TopicSuggestionModal
+            open={socialSuggestionOpen}
+            onOpenChange={setSocialSuggestionOpen}
+            newsTitle={selectedNewsForSuggestion.topic}
+            newsContent={selectedNewsForSuggestion.brief?.join(" ") || ""}
+            topicType="social"
+          />
+        </>
+      )}
 
       {/* Social Scheduler Modal */}
       {selectedTopicForSocial && (

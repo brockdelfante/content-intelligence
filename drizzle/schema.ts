@@ -165,3 +165,16 @@ export const baseKeywords = mysqlTable("base_keywords", {
 
 export type BaseKeyword = typeof baseKeywords.$inferSelect;
 export type InsertBaseKeyword = typeof baseKeywords.$inferInsert;
+
+// ─── User Topics (My Topics tab) ────────────────────────────────────────────────
+
+export const userTopics = mysqlTable("user_topics", {
+  id: int("id").autoincrement().primaryKey(),
+  topicType: mysqlEnum("topicType", ["social", "article"]).notNull(),
+  topicTitle: text("topicTitle").notNull(),
+  newsSourceTitle: text("newsSourceTitle"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type UserTopic = typeof userTopics.$inferSelect;
+export type InsertUserTopic = typeof userTopics.$inferInsert;

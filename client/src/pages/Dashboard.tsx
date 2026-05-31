@@ -23,8 +23,9 @@ import KeywordsTab from "../components/KeywordsTab";
 import ResearchTab from "../components/ResearchTab";
 import TopicQueueTab from "../components/TopicQueueTab";
 import BaseKeywordsTab from "../components/BaseKeywordsTab";
+import { MyTopicsTab } from "../components/MyTopicsTab";
 
-type Tab = "queue" | "research" | "keywords" | "gaps" | "base-keywords";
+type Tab = "queue" | "research" | "keywords" | "gaps" | "base-keywords" | "my-topics";
 
 const NAV_ITEMS: { id: Tab; label: string; icon: React.ReactNode; description: string }[] = [
   {
@@ -56,6 +57,12 @@ const NAV_ITEMS: { id: Tab; label: string; icon: React.ReactNode; description: s
     label: "Keyword Scope",
     icon: <BookOpen size={16} />,
     description: "Configure agent keywords",
+  },
+  {
+    id: "my-topics",
+    label: "My Topics",
+    icon: <Layers size={16} />,
+    description: "Your saved topic ideas",
   },
 ];
 
@@ -155,6 +162,7 @@ export default function Dashboard() {
           {activeTab === "keywords" && <KeywordsTab />}
           {activeTab === "gaps" && <ContentGapsTab />}
           {activeTab === "base-keywords" && <BaseKeywordsTab />}
+          {activeTab === "my-topics" && <MyTopicsTab />}
         </div>
       </main>
     </div>

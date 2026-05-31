@@ -2,6 +2,7 @@ import { and, desc, eq, gte, lt, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   InsertUser,
+  InsertUserTopic,
   agentRuns,
   appConfig,
   baseKeywords,
@@ -10,6 +11,7 @@ import {
   removedTopics,
   researchSummaries,
   topics,
+  userTopics,
   users,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
@@ -389,4 +391,33 @@ export async function setConfig(key: string, value: string) {
     .insert(appConfig)
     .values({ key, value })
     .onDuplicateKeyUpdate({ set: { value } });
+}
+
+// ─── User Topics (My Topics tab) ────────────────────────────────────────────────
+
+export async function saveUserTopic(userTopic: InsertUserTopic) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.insert(userTopics).values(userTopic);
+  return result[0]?.insertId ?? null;
+}
+
+export async function listUserTopics() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(userTopics).orderBy(userTopics.createdAt);
+}
+
+export async function deleteUserTopic(id: number) {
+  const db = await getDb();
+  if (!db) return false;
+  await db.delete(userTopics).where(eq(userTopics.id, id));
+  return true;
+}
+
+export async function clearUserTopics(topicType: "social" | "article") {
+  const db = await getDb();
+  if (!db) return false;
+  await db.delete(userTopics).where(eq(userTopics.topicType, topicType));
+  return true;
 }

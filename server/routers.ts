@@ -8,6 +8,8 @@ import { runDailyAgent } from "./agent/agentRunner";
 import { invokeLLM } from "./_core/llm";
 import {
   approveTopic,
+  clearUserTopics,
+  deleteUserTopic,
   getLastAgentRun,
   listAgentRuns,
   listBaseKeywords,
@@ -15,8 +17,10 @@ import {
   listKeywords,
   listResearchSummaries,
   listTopics,
+  listUserTopics,
   removeTopic,
   saveBaseKeywords,
+  saveUserTopic,
   updateTopicPublished,
 } from "./db";
 
@@ -249,6 +253,56 @@ export const appRouter = router({
   baseKeywords: baseKeywordsRouter,
   agent: agentRouter,
   social: socialRouter,
+  userTopics: router({
+    list: publicProcedure.query(() => listUserTopics()),
+    save: publicProcedure
+      .input(
+        z.object({
+          topicType: z.enum(["social", "article"]),
+          topicTitle: z.string().min(1),
+          newsSourceTitle: z.string().optional(),
+        })
+      )
+      .mutation(({ input }) => saveUserTopic(input)),
+    delete: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(({ input }) => deleteUserTopic(input.id)),
+    clear: publicProcedure
+      .input(z.object({ topicType: z.enum(["social", "article"]) }))
+      .mutation(({ input }) => clearUserTopics(input.topicType)),
+    generateSuggestions: publicProcedure
+      .input(
+        z.object({
+          newsTitle: z.string(),
+          newsContent: z.string(),
+          topicType: z.enum(["social", "article"]),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const prompt =
+          input.topicType === "social"
+            ? `Given this news article, generate 5 compelling social media post topics/titles that would resonate on LinkedIn. Each should be 5-12 words, actionable, and leverage the news angle. Return as JSON array of strings: ["topic1", "topic2", ...]. Article: ${input.newsTitle} - ${input.newsContent}`
+            : `Given this news article, generate 5 blog article topics/titles that would provide in-depth analysis. Each should be 8-15 words, SEO-friendly, and position the content as authoritative. Return as JSON array of strings: ["topic1", "topic2", ...]. Article: ${input.newsTitle} - ${input.newsContent}`;
+
+        const response = await invokeLLM({
+          messages: [
+            {
+              role: "system",
+              content: "You are a content strategist. Generate creative, relevant topics based on news articles.",
+            },
+            { role: "user", content: prompt },
+          ],
+        });
+
+        const content = (response.choices[0]?.message.content || "[]") as string;
+        try {
+          const topics = JSON.parse(content);
+          return Array.isArray(topics) ? topics.slice(0, 5) : [];
+        } catch {
+          return [];
+        }
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

@@ -95,17 +95,18 @@
 
 
 ## Topic Generation & My Topics Feature
-- [ ] DB schema: add user_topics table (id, topicType, topicTitle, newsSourceId, createdAt)
-- [ ] DB helpers: saveUserTopic, listUserTopics, deleteUserTopic, clearUserTopics
+- [x] DB schema: add user_topics table (id, topicType, topicTitle, newsSourceId, createdAt)
+- [x] DB helpers: saveUserTopic, listUserTopics, deleteUserTopic, clearUserTopics
 - [ ] Agent: generate 5 blog topic suggestions from each news article
 - [ ] Agent: generate 5 social topic suggestions from each news article
-- [ ] tRPC: social.generateTopicSuggestions (returns 5 suggestions for a news article)
-- [ ] tRPC: article.generateTopicSuggestions (returns 5 suggestions for a news article)
-- [ ] tRPC: topics.saveUserTopic (saves selected topic to user_topics table)
-- [ ] tRPC: topics.listUserTopics (returns all saved topics, grouped by type)
-- [ ] Frontend: TopicSuggestionModal component (Social and Article variants)
-- [ ] Frontend: "Social Post" and "Article Post" buttons on Topic Queue rows
-- [ ] Frontend: My Topics tab with two-column spreadsheet (Social / Article)
-- [ ] Frontend: Copy and Clear buttons for each column in My Topics
-- [ ] Frontend: Refresh button in modals to generate 5 new suggestions
+- [x] tRPC: userTopics.generateSuggestions (returns 5 suggestions for a news article)
+- [x] tRPC: userTopics.save (saves selected topic to user_topics table)
+- [x] tRPC: userTopics.list (returns all saved topics, grouped by type)
+- [x] tRPC: userTopics.delete (deletes a saved topic)
+- [x] tRPC: userTopics.clear (clears all topics of a type)
+- [x] Frontend: TopicSuggestionModal component (Social and Article variants)
+- [x] Frontend: "Social Post" and "Article Post" buttons on Topic Queue rows
+- [x] Frontend: My Topics tab with two-column spreadsheet (Social / Article)
+- [x] Frontend: Copy and Clear buttons for each column in My Topics
+- [x] Frontend: Refresh button in modals to generate 5 new suggestions
 - [ ] Tests: topic generation, user topic CRUD, modal interactions
